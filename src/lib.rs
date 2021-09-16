@@ -49,7 +49,13 @@ impl Log for SentryLogger {
                     record.file().unwrap_or("(unknown_file)"),
                     record.line().unwrap_or(0),
                 )),
-                level: sentry::Level::Info,
+                level: match record.level() {
+                    log::Level::Error => sentry::Level::Error,
+                    log::Level::Warn => sentry::Level::Warning,
+                    log::Level::Info => sentry::Level::Info,
+                    log::Level::Debug => sentry::Level::Debug,
+                    log::Level::Trace => sentry::Level::Debug,
+                },
                 ..Default::default()
             };
             sentry::capture_event(event);
