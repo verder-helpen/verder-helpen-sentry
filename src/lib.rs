@@ -5,6 +5,8 @@ use rocket::{
 };
 use sentry::ClientInitGuard;
 
+pub use sentry::types::Dsn;
+
 pub struct SentryLogger {
     inner: Box<dyn Log>,
 }
@@ -72,7 +74,7 @@ pub struct SentryFairing {
 }
 
 impl SentryFairing {
-    pub fn new(dsn: &str, name: &'static str) -> SentryFairing {
+    pub fn new(dsn: Dsn, name: &'static str) -> SentryFairing {
         SentryFairing {
             _guard: sentry::init((
                 dsn,
