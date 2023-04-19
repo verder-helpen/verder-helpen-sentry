@@ -1,0 +1,31 @@
+name: Update and create PR
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      CI_COMMIT_AUTHOR: Github Action
+      CI_COMMIT_EMAIL: "github-action@users.noreply.github.com"
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install cargo-edit
+      run: cargo install cargo-edit
+    - run: cargo upgrade
+    - run: cargo update
+    - name: Commit files
+      run: |
+        git config user.name "${{ env.CI_COMMIT_AUTHOR }}"
+        git config user.email "${{ env.CI_COMMIT_EMAIL }}"
+        git add Cargo.toml
+        git commit -m "Cargo upgrade"
+        git checkout -b cargo-upgrade-`git rev-parse --short HEAD`
+        git push --set-upstream origin cargo-upgrade-`git rev-parse --short HEAD`
+    - name: Create pull request
+      run: gh pr create -B main -H cargo-upgrade-`git rev-parse --short HEAD` --title "Cargo upgrade" --body "Scheduled PR created by Github action"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
