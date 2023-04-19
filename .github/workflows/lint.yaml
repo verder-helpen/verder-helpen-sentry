@@ -1,0 +1,88 @@
+name: Build, run tests and lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git
+        key: build-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: build-
+
+    - run: cargo build --all-features --verbose
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git
+        key: test-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: test-
+
+    - run: cargo test --all-features --verbose
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        rustup toolchain install nightly
+        rustup default nightly
+        rustup component add rustfmt
+    - run: cargo fmt -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git
+        key: clippy-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: clippy-
+
+    - run: cargo clippy --all-features -- -D warnings
+
+  udeps:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git
+        key: udeps-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: udeps-
+
+    - run: |
+        cargo install cargo-udeps
+        rustup toolchain install nightly
+        rustup default nightly
+    - run: cargo udeps --all-features --all-targets
