@@ -1,5 +1,6 @@
 name: Build, run tests and lint
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -82,7 +83,7 @@ jobs:
         restore-keys: udeps-
 
     - run: |
-        cargo install cargo-udeps
+        cargo install cargo-udeps || true
         rustup toolchain install nightly
         rustup default nightly
     - run: cargo udeps --all-features --all-targets
