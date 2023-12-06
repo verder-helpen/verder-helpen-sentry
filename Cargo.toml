@@ -6,7 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-env_logger = "0.10.0"
+env_logger = "0.10.1"
 sentry = "0.29.3"
-log = "0.4.18"
-rocket = "0.5.0-rc.3"
+log = "0.4.20"
+rocket = "0.5.0"
